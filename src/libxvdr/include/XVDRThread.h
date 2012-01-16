@@ -26,6 +26,9 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include "stdint.h"
+#ifdef ANDROID
+#include <pthread.h>
+#endif
 
 uint64_t ntohll(uint64_t a);
 uint64_t htonll(uint64_t a);

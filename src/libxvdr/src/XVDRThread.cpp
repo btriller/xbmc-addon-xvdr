@@ -32,7 +32,7 @@
 #include <malloc.h>
 #endif
 
-#if !defined(__WINDOWS__)
+#if !defined(__WINDOWS__) && !defined(ANDROID)
 #include <sys/signal.h>
 #endif
 
@@ -257,7 +257,7 @@ void *cThread::StartThread(cThread *Thread)
   Thread->childThreadId = ThreadId();
   if (Thread->description) {
      XVDRLog(XVDR_DEBUG, "%s thread started (pid=%d, tid=%d)", Thread->description, getpid(), Thread->childThreadId);
-#ifdef PR_SET_NAME
+#if defined(PR_SET_NAME) && !defined(ANDROID)
      if (prctl(PR_SET_NAME, Thread->description, 0, 0, 0) < 0)
         XVDRLog(XVDR_ERROR, "%s thread naming failed (pid=%d, tid=%d)", Thread->description, getpid(), Thread->childThreadId);
 #endif
@@ -340,7 +340,9 @@ void cThread::Cancel(int WaitSeconds)
       }
       XVDRLog(XVDR_ERROR, "ERROR: %s thread %d won't end (waited %d seconds) - canceling it...", description ? description : "", childThreadId, WaitSeconds);
     }
+#ifndef ANDROID
     pthread_cancel(childTid);
+#endif
 #if !defined(__WINDOWS__)
     childTid = 0;
 #endif
