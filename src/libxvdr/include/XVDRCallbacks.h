@@ -65,7 +65,7 @@ public:
 
   virtual std::string GetLanguageCode() = 0;
 
-  virtual const char* GetLocalizedString(int id) = 0;
+  virtual std::string GetLocalizedString(int id) = 0;
 
   // triggers
 

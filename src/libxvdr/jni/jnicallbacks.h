@@ -1,14 +1,17 @@
 #pragma once
 
-#include "XBMCAddon.h"
 #include "XVDRCallbacks.h"
-#include "XVDRThread.h"
+#include <jni.h>
 
-class cXBMCCallbacks : public cXVDRCallbacks
+class cJNICallbacks : public cXVDRCallbacks
 {
 public:
 
-  cXBMCCallbacks();
+  cJNICallbacks(JavaVM* java);
+
+  virtual ~cJNICallbacks();
+
+  void SetHandle(JNIEnv* env, jobject obj);
 
   void Log(LEVEL level, const std::string& text, ...);
 
@@ -22,13 +25,13 @@ public:
 
   std::string GetLocalizedString(int id);
 
+  bool GetSetting(const std::string& setting, void* value);
+
   void TriggerChannelUpdate();
 
   void TriggerRecordingUpdate();
 
   void TriggerTimerUpdate();
-
-  void SetHandle(PVR_HANDLE handle);
 
   void TransferChannelEntry(PVR_CHANNEL* channel);
 
@@ -42,15 +45,20 @@ public:
 
   void TransferChannelGroupMember(PVR_CHANNEL_GROUP_MEMBER* member);
 
-  XVDRPacket* AllocatePacket(int length);
+  XVDRPacket* AllocatePacket(int s);
 
   uint8_t* GetPacketPayload(XVDRPacket* packet);
 
-  void SetPacketData(XVDRPacket* packet, uint8_t* data = NULL, int streamid = 0, uint64_t dts = 0, uint64_t pts = 0);
+  void SetPacketData(XVDRPacket* packet, uint8_t* data, int streamid, uint64_t dts, uint64_t pts);
 
   void FreePacket(XVDRPacket* packet);
 
 private:
 
-  PVR_HANDLE m_handle;
+  JNIEnv* m_env;
+
+  jobject m_obj;
+
+  JavaVM* m_java;
+
 };

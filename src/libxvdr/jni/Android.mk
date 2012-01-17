@@ -17,6 +17,20 @@ LOCAL_SRC_FILES := \
 	../src/XVDRThread.cpp
 
 LOCAL_CFLAGS    := -I$(LOCAL_PATH)/../include -DUSE_DEMUX=1
-LOCAL_LDLIBS    := -lz
+LOCAL_LDLIBS    := -lz -llog
+
+include $(BUILD_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE    := xvdrjni
+LOCAL_SRC_FILES := \
+	jnicallbacks.cpp \
+	jniinterface.cpp
+
+LOCAL_SHARED_LIBRARIES := xvdr
+
+LOCAL_CFLAGS    := -I$(LOCAL_PATH)/../include -DUSE_DEMUX=1
+LOCAL_LDLIBS    := -llog
 
 include $(BUILD_SHARED_LIBRARY)

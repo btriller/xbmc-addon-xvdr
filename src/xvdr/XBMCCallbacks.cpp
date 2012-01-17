@@ -89,7 +89,7 @@ std::string cXBMCCallbacks::GetLanguageCode()
   return (code == NULL) ? "" : code;
 }
 
-const char* cXBMCCallbacks::GetLocalizedString(int id)
+std::string cXBMCCallbacks::GetLocalizedString(int id)
 {
   return XBMC->GetLocalizedString(id);
 }
