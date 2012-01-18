@@ -84,6 +84,8 @@ protected:
   void OnDisconnect();
   void OnReconnect();
 
+  bool m_statusinterface;
+
 private:
 
   bool SendPing();

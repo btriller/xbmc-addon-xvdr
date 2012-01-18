@@ -32,7 +32,8 @@ extern "C" {
 #define CMD_LOCK cMutexLock CmdLock((cMutex*)&m_Mutex)
 
 cXVDRData::cXVDRData()
- : m_aborting(false)
+ : m_statusinterface(false)
+ , m_aborting(false)
  , m_timercount(0)
 {
 }
@@ -92,7 +93,7 @@ void cXVDRData::OnReconnect()
 {
   XBMC->QueueNotification(QUEUE_INFO, XBMC->GetLocalizedString(30045));
 
-  EnableStatusInterface(m_settings.HandleMessages(), true);
+  EnableStatusInterface(m_statusinterface, true);
   ChannelFilter(m_settings.FTAChannels(), m_settings.NativeLangOnly(), m_settings.vcaids, true);
   SetUpdateChannels(m_settings.UpdateChannels(), true);
 
@@ -198,7 +199,13 @@ bool cXVDRData::EnableStatusInterface(bool onOff, bool direct)
 
   uint32_t ret = vresp->extract_U32();
   delete vresp;
-  return ret == XVDR_RET_OK ? true : false;
+  if(ret == XVDR_RET_OK)
+  {
+    m_statusinterface = onOff;
+    return true;
+  }
+
+  return false;
 }
 
 bool cXVDRData::SetUpdateChannels(uint8_t method, bool direct)
