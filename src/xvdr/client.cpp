@@ -125,6 +125,8 @@ ADDON_STATUS ADDON_Create(void* hdl, void* props)
     s.Priority.set(11);
 
   XVDRData = new cXVDRData;
+  XVDRData->SetTimeout(s.ConnectTimeout() * 1000);
+
   cTimeMs RetryTimeout;
   bool bConnected = false;
 
@@ -141,6 +143,7 @@ ADDON_STATUS ADDON_Create(void* hdl, void* props)
     m_CurStatus = ADDON_STATUS_LOST_CONNECTION;
     return m_CurStatus;
   }
+
 
   if (!XVDRData->Login())
   {
@@ -482,6 +485,8 @@ bool OpenLiveStream(const PVR_CHANNEL &channel)
   CloseLiveStream();
 
   XVDRDemuxer = new cXVDRDemux;
+  XVDRDemuxer->SetTimeout(cXVDRSettings::GetInstance().ConnectTimeout() * 1000);
+
   return XVDRDemuxer->OpenChannel(channel);
 }
 
@@ -566,6 +571,8 @@ bool OpenRecordedStream(const PVR_RECORDING &recording)
   CloseRecordedStream();
 
   XVDRRecording = new cXVDRRecording;
+  XVDRRecording->SetTimeout(cXVDRSettings::GetInstance().ConnectTimeout() * 1000);
+
   return XVDRRecording->OpenRecording(recording);
 }
 

@@ -54,6 +54,8 @@ public:
   const std::string& GetServerName() { return m_server; }
   const std::string& GetVersion()    { return m_version; }
 
+  void SetTimeout(int ms);
+
   static void SleepMs(int ms);
 
 protected:
@@ -71,6 +73,7 @@ protected:
   int             m_port;
   std::string     m_name;
   cXVDRSettings&  m_settings;
+  int             m_timeout;
 
 private:
 

@@ -44,6 +44,7 @@ using namespace ADDON;
 
 cXVDRSession::cXVDRSession()
   : m_settings(cXVDRSettings::GetInstance())
+  , m_timeout(3000)
   , m_fd(INVALID_SOCKET)
   , m_protocol(0)
   , m_connectionLost(false)
@@ -75,7 +76,7 @@ bool cXVDRSession::Open(const std::string& hostname, const char *name)
   Close();
 
   char errbuf[128];
-  m_fd = tcp_connect(hostname.c_str(), m_port, errbuf, sizeof(errbuf), m_settings.ConnectTimeout() * 1000);
+  m_fd = tcp_connect(hostname.c_str(), m_port, errbuf, sizeof(errbuf), m_timeout);
 
   if (m_fd == INVALID_SOCKET)
   {
@@ -239,7 +240,7 @@ cResponsePacket* cXVDRSession::ReadMessage()
 
 bool cXVDRSession::SendMessage(cRequestPacket* vrp)
 {
-  return (tcp_send_timeout(m_fd, vrp->getPtr(), vrp->getLen(), m_settings.ConnectTimeout() * 1000) == 0);
+  return (tcp_send_timeout(m_fd, vrp->getPtr(), vrp->getLen(), m_timeout * 1000) == 0);
 }
 
 cResponsePacket* cXVDRSession::ReadResult(cRequestPacket* vrp)
@@ -327,7 +328,12 @@ void cXVDRSession::SignalConnectionLost()
 
 bool cXVDRSession::readData(uint8_t* buffer, int totalBytes)
 {
-  return (tcp_read_timeout(m_fd, buffer, totalBytes, m_settings.ConnectTimeout() * 1000) == 0);
+  return (tcp_read_timeout(m_fd, buffer, totalBytes, m_timeout) == 0);
+}
+
+void cXVDRSession::SetTimeout(int ms)
+{
+  m_timeout = ms;
 }
 
 void cXVDRSession::SleepMs(int ms)

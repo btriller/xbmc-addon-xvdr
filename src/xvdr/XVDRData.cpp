@@ -117,7 +117,7 @@ cResponsePacket* cXVDRData::ReadResult(cRequestPacket* vrp)
     return NULL;
   }
 
-  message.event->Wait(m_settings.ConnectTimeout() * 1000);
+  message.event->Wait(m_timeout);
 
   m_Mutex.Lock();
 
