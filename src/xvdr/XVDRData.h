@@ -102,4 +102,9 @@ private:
   std::string     m_videodir;
   bool            m_aborting;
   uint32_t        m_timercount;
+  uint8_t         m_updatechannels;
+  bool            m_ftachannels;
+  bool            m_nativelang;
+  std::vector<int> m_caids;
+
 };

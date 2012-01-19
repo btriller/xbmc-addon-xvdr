@@ -35,6 +35,7 @@ cXVDRData::cXVDRData()
  : m_statusinterface(false)
  , m_aborting(false)
  , m_timercount(0)
+ , m_updatechannels(2)
 {
 }
 
@@ -94,8 +95,8 @@ void cXVDRData::OnReconnect()
   XBMC->QueueNotification(QUEUE_INFO, XBMC->GetLocalizedString(30045));
 
   EnableStatusInterface(m_statusinterface, true);
-  ChannelFilter(m_settings.FTAChannels(), m_settings.NativeLangOnly(), m_settings.vcaids, true);
-  SetUpdateChannels(m_settings.UpdateChannels(), true);
+  ChannelFilter(m_ftachannels, m_nativelang, m_caids, true);
+  SetUpdateChannels(m_updatechannels, true);
 
   PVR->TriggerTimerUpdate();
   PVR->TriggerRecordingUpdate();
@@ -225,7 +226,13 @@ bool cXVDRData::SetUpdateChannels(uint8_t method, bool direct)
 
   uint32_t ret = vresp->extract_U32();
   delete vresp;
-  return ret == XVDR_RET_OK ? true : false;
+  if (ret == XVDR_RET_OK)
+  {
+    m_updatechannels = method;
+    return true;
+  }
+
+  return false;
 }
 
 bool cXVDRData::ChannelFilter(bool fta, bool nativelangonly, std::vector<int>& caids, bool direct)
@@ -252,7 +259,16 @@ bool cXVDRData::ChannelFilter(bool fta, bool nativelangonly, std::vector<int>& c
 
   uint32_t ret = vresp->extract_U32();
   delete vresp;
-  return ret == XVDR_RET_OK ? true : false;
+
+  if (ret == XVDR_RET_OK)
+  {
+    m_ftachannels = fta;
+    m_nativelang = nativelangonly;
+    m_caids = caids;
+    return true;
+  }
+
+  return false;
 }
 
 int cXVDRData::GetChannelsCount()

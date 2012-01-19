@@ -43,11 +43,12 @@
 using namespace ADDON;
 
 cXVDRSession::cXVDRSession()
-  : m_settings(cXVDRSettings::GetInstance())
-  , m_timeout(3000)
+  : m_timeout(3000)
   , m_fd(INVALID_SOCKET)
   , m_protocol(0)
   , m_connectionLost(false)
+  , m_compressionlevel(0)
+  , m_audiotype(0)
 {
   m_port = 34891;
 }
@@ -102,7 +103,7 @@ bool cXVDRSession::Login()
   if (!vrp.add_U32(XVDRPROTOCOLVERSION))
     return false;
 #ifdef HAVE_ZLIB
-  if (!vrp.add_U8(m_settings.Compression()*3))
+  if (!vrp.add_U8(m_compressionlevel))
     return false;
 #else
   if (!vrp.add_U8(0))
@@ -116,7 +117,7 @@ bool cXVDRSession::Login()
 
   if (!vrp.add_String((lang != NULL) ? lang : ""))
     return false;
-  if (!vrp.add_U8(m_settings.AudioType()))
+  if (!vrp.add_U8(m_audiotype))
     return false;
 
   // read welcome
@@ -334,6 +335,19 @@ bool cXVDRSession::readData(uint8_t* buffer, int totalBytes)
 void cXVDRSession::SetTimeout(int ms)
 {
   m_timeout = ms;
+}
+
+void cXVDRSession::SetCompressionLevel(int level)
+{
+  if (level < 0 || level > 9)
+    return;
+
+  m_compressionlevel = level;
+}
+
+void cXVDRSession::SetAudioType(int type)
+{
+  m_audiotype = type;
 }
 
 void cXVDRSession::SleepMs(int ms)
