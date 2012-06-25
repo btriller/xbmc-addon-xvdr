@@ -23,7 +23,10 @@
 
 #include "XVDRCallbacks.h"
 #include "XVDRSession.h"
+#include "XVDRThread.h"
+
 #include <string>
+#include <queue>
 
 #include "xbmc_pvr_types.h"
 
@@ -39,7 +42,7 @@ struct SQuality
   uint32_t    fe_unc;
 };
 
-class cXVDRDemux : public cXVDRSession
+class cXVDRDemux : public cXVDRSession, protected cThread
 {
 public:
 
@@ -57,7 +60,13 @@ public:
 
 protected:
 
+  void Action();
+
   void OnReconnect();
+
+  XVDRPacket* ReadPacket();
+
+  void CleanupPacketQueue();
 
   void StreamChange(cXVDRResponsePacket *resp);
   void StreamStatus(cXVDRResponsePacket *resp);
@@ -70,4 +79,6 @@ private:
   PVR_CHANNEL           m_channelinfo;
   SQuality              m_Quality;
   int                   m_priority;
+  std::queue<XVDRPacket*> m_queue;
+  cMutex                m_lock;
 };

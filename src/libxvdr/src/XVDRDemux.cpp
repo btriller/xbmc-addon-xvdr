@@ -40,10 +40,15 @@ cXVDRDemux::cXVDRDemux() : m_priority(50)
 
 cXVDRDemux::~cXVDRDemux()
 {
+  Cancel(5);
+  CleanupPacketQueue();
 }
 
 bool cXVDRDemux::OpenChannel(const std::string& hostname, const PVR_CHANNEL &channelinfo)
 {
+  Cancel(5);
+  CleanupPacketQueue();
+
   m_channelinfo = channelinfo;
   if(!cXVDRSession::Open(hostname))
     return false;
@@ -78,23 +83,70 @@ void cXVDRDemux::Abort()
   cXVDRSession::Abort();
 }
 
+void cXVDRDemux::Action()
+{
+  while(Running())
+  {
+    XVDRPacket* p = ReadPacket();
+    if (p != NULL)
+    {
+      m_lock.Lock();
+      m_queue.push(p);
+      m_lock.Unlock();
+    }
+  }
+}
+
 XVDRPacket* cXVDRDemux::Read()
+{
+  XVDRPacket* p = NULL;
+  m_lock.Lock();
+
+  if (!m_queue.empty())
+  {
+    p = m_queue.front();
+    m_queue.pop();
+  }
+
+  m_lock.Unlock();
+
+  if(p == NULL) {
+    p = XVDRAllocatePacket(0);
+  }
+
+  return p;
+}
+
+void cXVDRDemux::CleanupPacketQueue()
+{
+  XVDRPacket* p = NULL;
+  m_lock.Lock();
+  while(!m_queue.empty())
+  {
+    p = m_queue.front();
+    m_queue.pop();
+    XVDRFreePacket(p);
+  }
+  m_lock.Unlock();
+}
+
+XVDRPacket* cXVDRDemux::ReadPacket()
 {
   if(ConnectionLost())
   {
     SleepMs(100);
-    return XVDRAllocatePacket(0);
+    return NULL;
   }
 
   cXVDRResponsePacket *resp = ReadMessage();
 
   if(resp == NULL)
-    return XVDRAllocatePacket(0);
+    return NULL;
 
   if (resp->getChannelID() != XVDR_CHANNEL_STREAM)
   {
     delete resp;
-    return XVDRAllocatePacket(0);
+    return NULL;
   }
 
   XVDRPacket* pkt = NULL;
@@ -160,11 +212,15 @@ XVDRPacket* cXVDRDemux::Read()
   }
 
   delete resp;
-  return XVDRAllocatePacket(0);
+  return NULL;
 }
 
 bool cXVDRDemux::SwitchChannel(const PVR_CHANNEL &channelinfo)
 {
+
+  Cancel(5);
+  CleanupPacketQueue();
+
   XVDRLog(XVDR_DEBUG, "changing to channel %d (priority %i)", channelinfo.iChannelNumber, m_priority);
 
   cRequestPacket vrp;
@@ -174,6 +230,8 @@ bool cXVDRDemux::SwitchChannel(const PVR_CHANNEL &channelinfo)
   {
     m_channelinfo = channelinfo;
     m_Streams.iStreamCount  = 0;
+
+    Start();
 
     return true;
   }
