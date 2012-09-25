@@ -14,9 +14,8 @@
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with XBMC; see the file COPYING.  If not, write to
- *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
- *  http://www.gnu.org/copyleft/gpl.html
+ *  along with XBMC; see the file COPYING.  If not, see
+ *  <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -32,7 +31,7 @@ typedef void* GUIHANDLE;
 #ifdef _WIN32
 #define GUI_HELPER_DLL "\\library.xbmc.gui\\libXBMC_gui" ADDON_HELPER_EXT
 #else
-#define GUI_HELPER_DLL "/library.xbmc.gui/libXBMC_gui-" ADDON_HELPER_ARCH "-" ADDON_HELPER_PLATFORM ADDON_HELPER_EXT
+#define GUI_HELPER_DLL "/library.xbmc.gui/libXBMC_gui-" ADDON_HELPER_ARCH ADDON_HELPER_EXT
 #endif
 
 #define ADDON_ACTION_PREVIOUS_MENU          10

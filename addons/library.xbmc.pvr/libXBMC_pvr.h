@@ -14,9 +14,8 @@
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with XBMC; see the file COPYING.  If not, write to
- *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
- *  http://www.gnu.org/copyleft/gpl.html
+ *  along with XBMC; see the file COPYING.  If not, see
+ *  <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -31,7 +30,7 @@
 #ifdef _WIN32
 #define PVR_HELPER_DLL "\\library.xbmc.pvr\\libXBMC_pvr" ADDON_HELPER_EXT
 #else
-#define PVR_HELPER_DLL "/library.xbmc.pvr/libXBMC_pvr-" ADDON_HELPER_ARCH "-" ADDON_HELPER_PLATFORM ADDON_HELPER_EXT
+#define PVR_HELPER_DLL "/library.xbmc.pvr/libXBMC_pvr-" ADDON_HELPER_ARCH ADDON_HELPER_EXT
 #endif
 
 #define DVD_TIME_BASE 1000000
